@@ -1,0 +1,26 @@
+to get the info I need I need to know
+1. The champion
+2. The winrate
+3. The division check
+4. Items bought
+
+Filteram:
+1. Po divisionu (upitno, vjerojatno nije poterbno) done
+2. Po championu done
+3. Uzmem winrate za iteme
+Onda mogu odabrat jedan ili dva itema koji imaju najveci winrate ili mogu uzet 5 itema i uzet ako build (pazi na boots)
+
+pomocu funkcije i inputa odredim matcheve u kojima se igrao željeni champion
+    champion = input('Which champion do you want a build for?')
+    def get_champ_match_list(champion):
+    for match in matchList:
+        if champion == match.participants.champion.name:
+            champList.write(match)
+
+
+
+uzmem item listu od trazenog champa u svakom matchu u kojem je igrao
+
+izmagiciram winrate za item
+
+displayam iteme sa najvecim winrateovima
