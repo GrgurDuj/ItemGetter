@@ -8,7 +8,7 @@ from cassiopeia.type.api.exception import APIError
 from cassiopeia.type.core.common import LoadPolicy
 from set_up import set_up
 
-set_up('EUNE')
+set_up('KR')
 
 def auto_retry(api_call_method):
     """ A decorator to automatically retry 500s (Service Unavailable)
@@ -45,57 +45,56 @@ riotapi.get_summoner_by_name = auto_retry(riotapi.get_summoner_by_name)
 unpulled_summoners = deque(entry.summoner for entry in riotapi.get_challenger())
 
 pulled_summoners = deque()
-gather_start = datetime(2017, 7, 9)  # 1 day after patch 5.14
-# matchList = open('MatchList.txt', 'a+')
+gather_start = datetime(2017, 7, 9)
 match_set = set()
 
-total_requests = 0
+total_req = 0
 
 
 def check_req():
-    global total_requests
-    if total_requests >= 200:
-        print('Taking a pause' + total_requests)
+    global total_req
+    print('check print', total_req)
+    if total_req >= 190:
+        print('Request overload, sleeping.')
         t.sleep(120)
-        total_requests = 0
+        total_req = 0
     return
 
 
 def inc_req(inc):
-    global total_requests
-    total_requests += inc
+    global total_req
 
+    total_req += inc
+    print('inc print::new', total_req)
+
+i=0
 
 while len(unpulled_summoners) > 0:
-
     summoner = unpulled_summoners.popleft()
-    print
     check_req()
+    if i is not 0:
+        t.sleep(120)
+        total_req = 0
+    i+=1
     summMatchList = summoner.match_list(begin_time=gather_start)
-    t.sleep(7)
     inc_req(len(summMatchList))
-    print('summMatchList', len(summMatchList))
+    print('summMatchList' , len(summMatchList))
     for match_reference in summMatchList:
-
         # If you are connected to a database, the match will automatically be stored in it.
         # Simply pull the match, and it's in your database for whenever you need it again!
         # If you pull a match twice, the second time it will be loaded from the database rather than pulled from Riot
         # and therefore will not count against your rate limit. This is true of all datatypes, include Summoner.
         check_req()
-        print(total_requests)
+        print('?',total_req)
         match = riotapi.get_match(match_reference)
-        inc_req(1)
-
-        print('match', len(match), match)
+        inc_req(len(match))
         if match is None:  # If the match still fails to load, continue on to the next one
-            continue
-        elif match in match_set:
-            print('Match {} is duplicate'.format(match))
+                continue
+        elif str(match) in match_set:
+            print('Found duplicate' + match)
             continue
         else:
             match_set.add(match)
             print("Stored {0} in my database".format(match))
         pulled_summoners.append(summoner)
-        t.sleep(7)
-
     print(len(pulled_summoners))

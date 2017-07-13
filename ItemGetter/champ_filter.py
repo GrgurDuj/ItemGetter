@@ -25,9 +25,10 @@ def get_item_set():
                 relevMatches.add(match)
         except:
             print('Enter a valid champion name and lane.')
+            break
 
     listOfWinItems = []
     listOfLoseItems = []
 
     for match in relevMatches:
-        
+        if
